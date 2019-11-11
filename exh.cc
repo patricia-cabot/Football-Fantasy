@@ -19,11 +19,15 @@ struct Player {
 };
 
 /** */
-void write_alignment (const vector<Player>& candidates, const vector<int>& choosen, int n){
-  for (int i=0; i<n; ++i) if (choosen[i] == 1) cout << candidates[i].nom << ", ";
-  cout << endl;
+void write_alignment (const vector<Player>& candidates, const vector<int>& choosen, vector<vector<Player>>& all){
+  int n = choosen.size();
+  vector<Player> alignment;
+  for (int i=0; i<n; ++i){
+    if (choosen[i] == 1) alignment.push_back(candidates[i]);
+  } all.push_back(alignment);
 }
 
+/** */
 void print_alignment (const vector<Player>& alignment, Input input){
   int sum = 0, preu = 0;
   cout << "POR: ";
@@ -39,13 +43,43 @@ void print_alignment (const vector<Player>& alignment, Input input){
 }
 
 /** */
-void generate (const vector<Player>& candidates, vector<int>& choosen, int n, int i, int cont1, int cont0){
-  if (i == n){ write_alignment(candidates, choosen, n); cout << "generate" << endl;}
+void generate (const vector<Player>& candidates, vector<int>& choosen, vector<vector<Player>>& all, Input input, int i, int cont1,
+              int cont0, int contpor, int contdef, int contmig, int contdav, int preu){
+  int n = choosen.size();
+  if (i == n) write_alignment(candidates, choosen, all);
   else {
-    if (cont0 < n-11) generate(candidates, choosen, n, i+1, cont1, cont0+1);
-    choosen[i] = 1;
-    if (cont1 < 11) generate(candidates, choosen, n, i+1, cont1+1, cont0);
+    choosen[i] = 0;
+    if (cont0 < n-11) generate (candidates, choosen, all, input, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, preu);
+    if (cont1 < 11){
+      if (candidates[i].pos == "por" and contpor == 0 and candidates[i].preu+preu <= input.t){
+        choosen[i] = 1;
+        generate (candidates, choosen, all, input, i+1, cont1+1, cont0, contpor+1, contdef, contmig, contdav, candidates[i].preu+preu);
+      }
+      if (candidates[i].pos == "def" and contdef < input.n1 and candidates[i].preu+preu <= input.t){
+        choosen[i] = 1;
+        generate (candidates, choosen, all, input, i+1, cont1+1, cont0, contpor, contdef+1, contmig, contdav, candidates[i].preu+preu);
+      }
+      if (candidates[i].pos == "mig" and contmig < input.n2 and candidates[i].preu+preu <= input.t){
+        choosen[i] = 1;
+        generate (candidates, choosen, all, input, i+1, cont1+1, cont0, contpor, contdef, contmig+1, contdav, candidates[i].preu+preu);
+      }
+      if (candidates[i].pos == "dav" and contdav < input.n3 and candidates[i].preu+preu <= input.t){
+        choosen[i] = 1;
+        generate (candidates, choosen, all, input, i+1, cont1+1, cont0, contpor, contdef, contmig, contdav+1, candidates[i].preu+preu);
+      }
+    }
   }
+}
+
+vector<Player> get_best_alignment (const vector<vector<Player>>& all){
+  int max = 0;
+  int punts = 0;
+  int n = all.size();
+  int posicio = 0;
+  for (int i=0; i<n; ++i ){
+    for(auto p : all[i]) punts += p.punts;
+    if (max < punts) max = punts, posicio = i;
+  } return all[posicio];
 }
 
 /** Retorna el vector */
@@ -53,10 +87,9 @@ vector<Player> generate_alignment(const vector<Player>& candidates, Input input)
   int n = candidates.size();
   vector<int> choosen (n, 0);
   vector<Player> alignment;
-  cout << "entra en generate" << endl;
-  generate(candidates, choosen, n, 0, 0, 0);
-  cout << "sale de generate" << endl;
-  return alignment;
+  vector<vector<Player>> all;
+  generate(candidates, choosen, all, input, 0, 0, 0, 0, 0, 0, 0, 0);
+  return get_best_alignment(all);
 }
 
 /** */
@@ -99,7 +132,7 @@ Input read_input (char* argv){
 }
 
 /** Input: ./a.out data_base.txt Projecte/public_benchs/easy-1.txt */
-/** Input (pequeña): ./a.out data.txt Projecte/public_benchs/easy-1.txt */
+/** Input (pequeña): ./a.out data.txt easy-0.txt */
 int main(int argc, char** argv){
   vector<Player> players = read_data(argv[1]);
   Input input = read_input(argv[2]);

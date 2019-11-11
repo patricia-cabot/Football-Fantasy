@@ -4,35 +4,40 @@ Unai Simón;por;10820037;Athletic Club;29
 Herrerín;por;1614262;Athletic Club;155
 Ter Stegen;por;41843856;FC Barcelona;239
 Neto;por;2102895;FC Barcelona;206
-Joel Robles;por;3195871;Real Betis;34
-Rubén Blanco;por;6327639;RC Celta;110
-Sergio A.;por;743771;RC Celta;56
-Iván Villar;por;360567;RC Celta;0
-Diego López;por;14916009;RCD Espanyol;216
-David Soria;por;17377162;Getafe CF;234
-Chichizola;por;506006;Getafe CF;3
-Aitor Fdez.;por;4627448;Levante UD;89
-Oier;por;911615;Levante UD;124
-Courtois;por;26221293;Real Madrid;151
-Lunin;por;653873;R. Valladolid CF;29
-Moyá;por;8325326;Real Sociedad;59
-Remiro;por;1073049;Real Sociedad;0
-Vaclík;por;25717896;Sevilla FC;180
-Jaume Domenech;por;558714;Valencia CF;37
-Cillessen;por;30704403;Valencia CF;19
-Masip;por;5815587;R. Valladolid CF;199
-Barbosa;por;457362;Villarreal CF;0
-Asenjo;por;9155892;Villarreal CF;204
-Andrés Fdez.;por;1603332;Villarreal CF;34
-Pacheco;por;17642117;D. Alavés;182
-Sivera;por;518984;D. Alavés;14
-Dmitrović;por;4355437;SD Eibar;122
-Cuéllar;por;6762106;CD Leganés;178
-Soriano;por;379235;CD Leganés;26
-André Grandi;por;363679;CD Leganés;0
-Rui Silva;por;2369101;Granada CF;0
-Aarón Escandell;por;351473;Granada CF;0
-Parera;por;357450;RCD Mallorca;0
-Manuel Reina;por;3836305;RCD Mallorca;0
-Rubén;por;3477754;C.A. Osasuna;0
-S. Herrera;por;386373;C.A. Osasuna;0
+Arias;def;3752802;Atlético De Madrid;130
+Giménez;def;35856143;Atlético De Madrid;156
+Savić;def;23750292;Atlético De Madrid;96
+San José;def;1004104;Athletic Club;92
+Balenziaga;def;463851;Athletic Club;29
+De Marcos;def;2883946;Athletic Club;112
+Lekue;def;454671;Athletic Club;11
+Yuri;def;25885808;Athletic Club;192
+Iñigo Martínez;def;11713398;Athletic Club;164
+Yeray;def;19457870;Athletic Club;161
+Unai Núñez;def;6352956;Athletic Club;64
+Arthur;mig;10463666;FC Barcelona;103
+Rafinha;mig;9289821;RC Celta;8
+Arturo Vidal;mig;7754692;FC Barcelona;158
+Busquets;mig;26577248;FC Barcelona;168
+Guardado;mig;3711063;Real Betis;116
+Tello;mig;2625897;Real Betis;130
+Kaptoum;mig;384807;Real Betis;28
+William Carvalho;mig;6579322;Real Betis;130
+Diego Lainez;mig;667311;Real Betis;24
+Javi García;mig;636892;Real Betis;33
+Canales;mig;19411316;Real Betis;187
+Joaquín;mig;4977711;Real Betis;145
+Brasanac;mig;1215129;C.A. Osasuna;78
+Portu;dav;9180181;Real Sociedad;160
+Nolito;dav;13426327;Sevilla FC;3
+Munir;dav;2412576;Sevilla FC;88
+Gameiro;dav;9623674;Valencia CF;119
+Santi Mina;dav;13911018;RC Celta;136
+Sobrino;dav;482904;Valencia CF;78
+Rodrigo;dav;35569305;Valencia CF;162
+Ferrán Torres;dav;1073555;Valencia CF;70
+Enes Ünal;dav;879668;R. Valladolid CF;110
+Sergi Guardiola;dav;12124884;R. Valladolid CF;77
+Sandro;dav;1815030;R. Valladolid CF;66
+Gerard;dav;33118894;Villarreal CF;145
+Bacca;dav;4030219;Villarreal CF;107
