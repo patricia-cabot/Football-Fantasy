@@ -31,13 +31,30 @@ void write_alignment (const vector<Player>& candidates, const vector<int>& choos
 void print_alignment (const vector<Player>& alignment, Input input){
   int sum = 0, preu = 0;
   cout << "POR: ";
-  for (auto p : alignment) if (p.pos == "por") cout << p.nom << ";", sum += p.punts, preu += p.preu;
-  cout << endl << "DEF: ";
-  for (auto p : alignment) if (p.pos == "def") cout << p.nom << ";", sum += p.punts, preu += p.preu;
+  cout << alignment[0].nom << endl;
+  sum += alignment[0].punts, preu += alignment[0].preu;
+  cout << "DEF: ";
+  bool primer = true;
+  for (int i=1; i<=input.n1; ++i){
+    if (primer) primer = false, cout << alignment[i].nom;
+    cout << ";" << alignment[i].nom;
+    sum += alignment[i].punts;
+    preu += alignment[i].preu;
+  } primer = true;
   cout << endl << "MIG: ";
-  for (auto p : alignment) if (p.pos == "mig") cout << p.nom << ";", sum += p.punts, preu += p.preu;
+  for (int i=input.n1+1; i<=input.n1+input.n2; ++i){
+    if (primer) primer = false, cout << alignment[i].nom;
+    cout << ";" << alignment[i].nom;
+    sum += alignment[i].punts;
+    preu += alignment[i].preu;
+  } primer = true;
   cout << endl << "DAV: ";
-  for (auto p : alignment) if (p.pos == "dav") cout << p.nom << ";", sum += p.punts, preu += p.preu;
+  for (int i=input.n2+input.n1+1; i<11; ++i){
+    if (primer) primer = false, cout << alignment[i].nom;
+    cout << ";" << alignment[i].nom;
+    sum += alignment[i].punts;
+    preu += alignment[i].preu;
+  }
   cout << endl << "Punts: " << sum << endl;
   cout << "Preu: " << preu << endl;
 }
