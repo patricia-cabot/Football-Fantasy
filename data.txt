@@ -1,0 +1,38 @@
+Adán;por;480632;Atlético De Madrid;1
+Oblak;por;51636336;Atlético De Madrid;274
+Unai Simón;por;10820037;Athletic Club;29
+Herrerín;por;1614262;Athletic Club;155
+Ter Stegen;por;41843856;FC Barcelona;239
+Neto;por;2102895;FC Barcelona;206
+Joel Robles;por;3195871;Real Betis;34
+Rubén Blanco;por;6327639;RC Celta;110
+Sergio A.;por;743771;RC Celta;56
+Iván Villar;por;360567;RC Celta;0
+Diego López;por;14916009;RCD Espanyol;216
+David Soria;por;17377162;Getafe CF;234
+Chichizola;por;506006;Getafe CF;3
+Aitor Fdez.;por;4627448;Levante UD;89
+Oier;por;911615;Levante UD;124
+Courtois;por;26221293;Real Madrid;151
+Lunin;por;653873;R. Valladolid CF;29
+Moyá;por;8325326;Real Sociedad;59
+Remiro;por;1073049;Real Sociedad;0
+Vaclík;por;25717896;Sevilla FC;180
+Jaume Domenech;por;558714;Valencia CF;37
+Cillessen;por;30704403;Valencia CF;19
+Masip;por;5815587;R. Valladolid CF;199
+Barbosa;por;457362;Villarreal CF;0
+Asenjo;por;9155892;Villarreal CF;204
+Andrés Fdez.;por;1603332;Villarreal CF;34
+Pacheco;por;17642117;D. Alavés;182
+Sivera;por;518984;D. Alavés;14
+Dmitrović;por;4355437;SD Eibar;122
+Cuéllar;por;6762106;CD Leganés;178
+Soriano;por;379235;CD Leganés;26
+André Grandi;por;363679;CD Leganés;0
+Rui Silva;por;2369101;Granada CF;0
+Aarón Escandell;por;351473;Granada CF;0
+Parera;por;357450;RCD Mallorca;0
+Manuel Reina;por;3836305;RCD Mallorca;0
+Rubén;por;3477754;C.A. Osasuna;0
+S. Herrera;por;386373;C.A. Osasuna;0
