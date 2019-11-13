@@ -2,13 +2,13 @@
 #include <vector>
 #include <ctime>
 #include <fstream>
+#include <limits>
 
 using namespace std;
 
-
 /** */
 struct Input {
-    int n1, n2, n3, t, j;
+    int N1, N2, N3, T, J;
 };
 
 
@@ -21,29 +21,24 @@ struct Player {
     int points;
 };
 
+// GLOBAL VARIABLES
+time_t START;
+Input INPUT;
+int MAX_POINT;
+int MIN_PRICE;
+vector<Player> candidates;
 
 /** */
-void all_alignments(const vector<Player>& candidates, const vector<int>& chosen, vector<vector<Player>>& all) {
-    int n = chosen.size();
-    vector<Player> alignment;
-    for (int i = 0; i < n; ++i){
-        if (chosen[i]) alignment.push_back(candidates[i]);
-    }
-    all.push_back(alignment);
-}
-
-
-/** */
-void print_alignment(const vector<Player>& alignment, Input input) {
+void print_alignment(const vector<Player>& alignment) {
     int points = 0, price = 0;
-    int n2 = input.n1+1;
-    int n3 = n2+input.n2;
+    int N2 = INPUT.N1+1;
+    int N3 = N2+INPUT.N2;
     bool first = true;
     for(int i = 0; i < 11; ++i) {
         if(i == 0) cout << "POR: ";
         if(i ==  1) {cout << endl << "DEF: "; first = true;}
-        if(i == n2) {cout << endl << "MIG: "; first = true;}
-        if(i == n3) {cout << endl << "DAV: "; first = true;}
+        if(i == N2) {cout << endl << "MIG: "; first = true;}
+        if(i == N3) {cout << endl << "DAV: "; first = true;}
         if (not first) cout << ";";
         first = false;
         cout << alignment[i].name;
@@ -54,71 +49,120 @@ void print_alignment(const vector<Player>& alignment, Input input) {
     cout << "Preu: "  << price  << endl;
 }
 
+void write_alignment(const vector<Player>& alignment) {
+    ofstream f("output.txt");
+    f << float(clock() - START)/CLOCKS_PER_SEC << endl;
+    int points = 0, price = 0;
+    int N2 = INPUT.N1+1;
+    int N3 = N2+INPUT.N2;
+    bool first = true;
+    for(int i = 0; i < 11; ++i) {
+        if(i == 0) f << "POR: ";
+        if(i ==  1) {f << endl << "DEF: "; first = true;}
+        if(i == N2) {f << endl << "MIG: "; first = true;}
+        if(i == N3) {f << endl << "DAV: "; first = true;}
+        if (not first) f << ";";
+        first = false;
+        f << alignment[i].name;
+        points += alignment[i].points;
+        price  += alignment[i].price;
+    } f << endl;
+    f << "Punts: " << points << endl;
+    f << "Preu: "  << price  << endl;
+    f.close();
+}
 
-/** */
-void generate(const vector<Player>& candidates, vector<int>& chosen, vector<vector<Player>>& all, Input input,
-            int i, int cont1, int cont0, int contpor, int contdef, int contmig, int contdav, int price) {
+vector<Player> chosen_to_alignment(const vector<int>& chosen) {
     int n = chosen.size();
-    if (i == n) all_alignments(candidates, chosen, all);
-    else {
+    vector<Player> alignment;
+    //cerr << "--- fuera for" << endl;
+    for(int i = 0; i < n; ++i) {
+        //cerr << "--- dentro for" << endl;
+        if(chosen[i]) alignment.push_back(candidates[i]);
+    }
+    //cerr << "-acaba chosen_to_alignment" << endl << endl;
+    return alignment;
+}
+  
+/** */
+void generate(vector<int>& chosen, int i,
+            int cont1, int cont0, int contpor, int contdef, int contmig, int contdav,
+            int price, int points, int& max_points, vector<Player>& best_alignment) {
+
+    int n = chosen.size();
+    if (cont1 == 11) {
+        //cerr << "--hay 11 chosen" << endl;
+        //cerr << max_points << " " << points << endl;
+        if(points > max_points) {
+            //cerr << "en el IF" << endl;
+            //cerr << max_points << " " << points << endl;
+            max_points = points;
+            best_alignment = chosen_to_alignment(chosen);
+            //cerr << "--- despues de best_alignment" << endl;
+            write_alignment(best_alignment);
+            //print_alignment(best_alignment);
+        } else {
+            points = 0;
+            price = 0;
+        }
+        //cerr << "holaaaa" << endl;
+    }
+    else if (i < n) {
         chosen[i] = 0;
-        if(cont0 < n-11) generate (candidates, chosen, all, input, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, price);
+        if(cont0 < n-11) {
+            //cerr << "entra generate cont0"<< endl;
+            generate (chosen, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, price, points, max_points, best_alignment);
+        }
         if(cont1 < 11) {
-            if(candidates[i].pos == "por" and contpor < 1 and candidates[i].price+price <= input.t){
+            //cerr << "hola" << endl;
+            int price_i = price+candidates[i].price;
+            int points_i = points+candidates[i].points;
+            if(candidates[i].pos == "por" and contpor < 1 and price_i+(10-cont1)*MIN_PRICE <= INPUT.T and points_i+(10-cont1)*MAX_POINT > max_points){
+                //cerr << "----hola por" << endl;
                 chosen[i] = 1;
-                generate (candidates, chosen, all, input, i+1, cont1+1, cont0, contpor+1, contdef, contmig, contdav, candidates[i].price+price);
+                generate (chosen, i+1, cont1+1, cont0, contpor+1, contdef, contmig, contdav, price_i, points_i, max_points, best_alignment);
             }
-            if(candidates[i].pos == "def" and contdef < input.n1 and candidates[i].price+price <= input.t){
+            if(candidates[i].pos == "def" and contdef < INPUT.N1 and price_i+(10-cont1)*MIN_PRICE <= INPUT.T and points_i+(10-cont1)*MAX_POINT > max_points){
+                //cerr << "----hola def" << endl;
                 chosen[i] = 1;
-                generate (candidates, chosen, all, input, i+1, cont1+1, cont0, contpor, contdef+1, contmig, contdav, candidates[i].price+price);
+                generate (chosen, i+1, cont1+1, cont0, contpor, contdef+1, contmig, contdav, price_i, points_i, max_points, best_alignment);
             }
-            if(candidates[i].pos == "mig" and contmig < input.n2 and candidates[i].price+price <= input.t){
+            if(candidates[i].pos == "mig" and contmig < INPUT.N2 and price_i+(10-cont1)*MIN_PRICE <= INPUT.T and points_i+(10-cont1)*MAX_POINT > max_points){
+                //cerr << "----hola mig" << endl;
                 chosen[i] = 1;
-                generate (candidates, chosen, all, input, i+1, cont1+1, cont0, contpor, contdef, contmig+1, contdav, candidates[i].price+price);
+                generate (chosen, i+1, cont1+1, cont0, contpor, contdef, contmig+1, contdav, price_i, points_i, max_points, best_alignment);
             }
-            if(candidates[i].pos == "dav" and contdav < input.n3 and candidates[i].price+price <= input.t){
+            if(candidates[i].pos == "dav" and contdav < INPUT.N3 and price_i+(10-cont1)*MIN_PRICE <= INPUT.T and points_i+(10-cont1)*MAX_POINT > max_points){
+                //cerr << "----hola dav" << endl;
                 chosen[i] = 1;
-                generate (candidates, chosen, all, input, i+1, cont1+1, cont0, contpor, contdef, contmig, contdav+1, candidates[i].price+price);
+                generate (chosen, i+1, cont1+1, cont0, contpor, contdef, contmig, contdav+1, price_i, points_i, max_points, best_alignment);
             }
         }
     }
 }
 
 
-/** From all possible alignments get the best one. */
-vector<Player> get_best_alignment(const vector<vector<Player>>& all) {
-    int n = all.size();
-    int max_points = 0, max_i = 0;
-    for(int i = 0; i < n; ++i ) {
-        int points = 0;
-        for(auto p : all[i]) points += p.points;
-        if (max_points < points) max_points = points, max_i = i;
-    }
-    return all[max_i];
-}
-
-
 /**  */
-vector<Player> generate_alignment(const vector<Player>& candidates, Input input) {
+void generate_alignment() {
     int n = candidates.size();
     vector<int> chosen(n); // From all players, the ones chosen for the alignment
     vector<Player> alignment; // 11 players that does fit the constrictions
-    vector<vector<Player>> all; // All possible alignments of 11 players
-    generate(candidates, chosen, all, input, 0, 0, 0, 0, 0, 0, 0, 0);
-
-    cout << "---------------" << endl;
-    for(auto& a : all) print_alignment(a, input);
-    cout << "---------------FIN" << endl;
-
-    return get_best_alignment(all);
+    vector<Player> best_alignment; // the best alignment found at the moment
+    int max_points = 0;
+    generate(chosen, 0, 0, 0, 0, 0, 0, 0, 0, 0, max_points, best_alignment);
 }
 
 
 /** */
-vector<Player> get_alignment(const vector<Player>& players, Input input) {
-    vector<Player> candidates; // Players that don't exceed player's price
-    for(auto p : players) if(p.price <= input.j) candidates.push_back(p);
-    return generate_alignment(candidates, input);
+void get_alignment(const vector<Player>& players) {
+    MAX_POINT = 0;
+    MIN_PRICE = numeric_limits<int>::max();
+    for(auto p : players) if(p.price <= INPUT.J) {
+        candidates.push_back(p);
+        if(p.price  < MIN_PRICE) MIN_PRICE = p.price;
+        if(p.points > MAX_POINT) MAX_POINT = p.points;
+    }
+    generate_alignment();
 }
 
 
@@ -144,25 +188,20 @@ vector<Player> read_data(char* argv) {
 
 
 /** */
-Input read_input (char* argv){
-    Input input;
+void read_input (char* argv){
     ifstream in(argv);
-    int n1, n2, n3, t, j;
+    int N1, N2, N3, T, J;
     while (not in.eof()){
-        in >> n1 >> n2 >> n3 >> t >> j;
-        input = {n1, n2, n3, t ,j};
+        in >> N1 >> N2 >> N3 >> T >> J;
+        INPUT = {N1, N2, N3, T ,J};
     } in.close();
-    return input;
 }
-
 
 /** Input: ./a.out data_base.txt Projecte/public_benchs/easy-1.txt
     Input (pequeña): ./a.out data.txt easy-0.txt */
 int main(int argc, char** argv){
+    START = clock();
     vector<Player> players = read_data(argv[1]);
-    Input input = read_input(argv[2]);
-    const time_t starting_time = clock();
-    vector<Player> alignment = get_alignment(players, input);
-    cout << float(clock() - starting_time)/CLOCKS_PER_SEC << endl;
-    print_alignment(alignment, input);
+    read_input(argv[2]);
+    get_alignment(players);
 }
