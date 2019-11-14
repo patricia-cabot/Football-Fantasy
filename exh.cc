@@ -90,33 +90,20 @@ vector<Player> chosen_to_alignment(const vector<int>& chosen) {
 void generate(vector<int>& chosen, int i,
             int cont1, int cont0, int contpor, int contdef, int contmig, int contdav,
             int price, int points, int& best_points, vector<Player>& best_alignment) {
-    /**
-    cerr << "* iteracio i = " << i << endl;
-    cerr << "** amb cont1 = " << cont1 << endl;
-    cerr << "*** amb cont0 = " << cont0 << endl;
-    cerr << "**** contadors: " << contpor << "-" << contdef << "-" << contmig << "-" << contdav << endl;
-    cerr << "***** price = " << price << " * points = " << points << " * best_points = " << best_points << endl << endl;
-    */
     int n = chosen.size();
-    if(cont1 == 11) {
-        if(points > best_points) {
-            cerr << float(clock() - START)/CLOCKS_PER_SEC << " *** " << points << endl ;
+    if(cont1 == 11 and points > best_points) {
+            //cerr << float(clock() - START)/CLOCKS_PER_SEC << " *** " << points << endl ;
             best_points = points;
             best_alignment = chosen_to_alignment(chosen);
-            write_alignment(best_alignment);
-        }
+            print_alignment(best_alignment);
+            //write_alignment(best_alignment);
     }
     else if(i < n) {
-        if(cont0 < n-11) {
-            chosen[i] = 0;
-            generate(chosen, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, price, points, best_points, best_alignment);
-        }
-
         int price_i  = price+CANDIDATES[i].price;
         int points_i = points+CANDIDATES[i].points;
-        int price_bound  = price_i+(11-cont1)*MIN_PRICE;
-        int points_bound = points_i+(11-cont1)*MAX_POINTS;
-        if(i < n and price_bound <= INPUT.T and points_bound > best_points) {
+        int price_bound  = price_i+(10-cont1)*MIN_PRICE;
+        int points_bound = points_i+(10-cont1)*MAX_POINTS;
+        if(price_bound <= INPUT.T and points_bound > best_points) {
             if(CANDIDATES[i].pos == "por" and contpor < 1) {
                 chosen[i] = 1;
                 generate(chosen, i+1, cont1+1, cont0, contpor+1, contdef, contmig, contdav, price_i, points_i, best_points, best_alignment);
@@ -133,6 +120,10 @@ void generate(vector<int>& chosen, int i,
                 chosen[i] = 1;
                 generate(chosen, i+1, cont1+1, cont0, contpor, contdef, contmig, contdav+1, price_i, points_i, best_points, best_alignment);
             }
+        }
+        if(cont0 < n-11) {
+            chosen[i] = 0;
+            generate(chosen, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, price, points, best_points, best_alignment);
         }
     }
 }
@@ -154,7 +145,7 @@ void get_alignment(const vector<Player>& players) {
     MAX_POINTS = 0;
     for(auto p : players) if(p.price <= INPUT.J) {
         CANDIDATES.push_back(p);
-        if(p.price  < MIN_PRICE)  MIN_PRICE  = p.price;
+        if(p.price  < MIN_PRICE and p.price != 0)  MIN_PRICE  = p.price;
         if(p.points > MAX_POINTS) MAX_POINTS = p.points;
     }
     generate_alignment();
