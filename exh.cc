@@ -6,7 +6,7 @@
 
 using namespace std;
 
-// *****************************************************************************
+// *******************************************************************************
 
 struct Input {
     int N1, N2, N3, T, J;
@@ -27,7 +27,7 @@ int MAX_POINTS;
 int MIN_PRICE;
 vector<Player> CANDIDATES;
 
-//******************************************************************************
+// *******************************************************************************
 
 void print_alignment(const vector<Player>& alignment) {
     cout << float(clock() - START)/CLOCKS_PER_SEC << endl;
@@ -74,67 +74,64 @@ void write_alignment(const vector<Player>& alignment) {
     f.close();
 }
 
-//******************************************************************************
+// *******************************************************************************
 
 // Converts the chosen vector into an alignment
 vector<Player> chosen_to_alignment(const vector<int>& chosen) {
-    //cerr << "-entra a CHOSEN_TO_ALIGNMENT" << endl;
     int n = chosen.size();
     vector<Player> alignment;
     for(int i = 0; i < n; ++i) {
         if(chosen[i]) alignment.push_back(CANDIDATES[i]);
     }
-    //cerr << "-acaba CHOSEN_TO_ALIGNMENT" << endl;
     return alignment;
 }
 
 // Generates possible alignments and choses the best one
 void generate(vector<int>& chosen, int i,
             int cont1, int cont0, int contpor, int contdef, int contmig, int contdav,
-            int price_i, int points_i, int& best_points, vector<Player>& best_alignment) {
-
-    int n = chosen.size();
+            int price, int points, int& best_points, vector<Player>& best_alignment) {
     /**
     cerr << "* iteracio i = " << i << endl;
     cerr << "** amb cont1 = " << cont1 << endl;
     cerr << "*** amb cont0 = " << cont0 << endl;
     cerr << "**** contadors: " << contpor << "-" << contdef << "-" << contmig << "-" << contdav << endl;
-    cerr << "***** price_i = " << price_i << " * points_i = " << points_i << " * best_points = " << best_points << endl << endl;
+    cerr << "***** price = " << price << " * points = " << points << " * best_points = " << best_points << endl << endl;
     */
+    int n = chosen.size();
     if(cont1 == 11) {
-        if(points_i > best_points) {
-            cerr << "POINTS: ---" << points_i << " ---BEST POINTS:" << best_points << endl;
-            best_points = points_i;
+        if(points > best_points) {
+            cerr << float(clock() - START)/CLOCKS_PER_SEC << " *** " << points << endl ;
+            best_points = points;
             best_alignment = chosen_to_alignment(chosen);
             write_alignment(best_alignment);
         }
-        else {points_i = 0;  price_i = 0;}
     }
     else if(i < n) {
-        chosen[i] = 0;
         if(cont0 < n-11) {
-            generate (chosen, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, price_i, points_i, best_points, best_alignment);
+            chosen[i] = 0;
+            generate(chosen, i+1, cont1, cont0+1, contpor, contdef, contmig, contdav, price, points, best_points, best_alignment);
         }
-        if(cont1 < 11) {
-            int price  = price_i+CANDIDATES[i].price;
-            int points = points_i+CANDIDATES[i].points;
-            int price_bound  = price+(11-cont1)*MIN_PRICE;
-            int points_bound = points_i+(11-cont1)*MAX_POINTS;
-            if(CANDIDATES[i].pos == "por" and contpor < 1 and price_bound <= INPUT.T and points_bound > best_points){
+
+        int price_i  = price+CANDIDATES[i].price;
+        int points_i = points+CANDIDATES[i].points;
+        int price_bound  = price_i+(11-cont1)*MIN_PRICE;
+        int points_bound = points_i+(11-cont1)*MAX_POINTS;
+        if(i < n and price_bound <= INPUT.T and points_bound > best_points) {
+            if(CANDIDATES[i].pos == "por" and contpor < 1) {
                 chosen[i] = 1;
-                generate (chosen, i+1, cont1+1, cont0, contpor+1, contdef, contmig, contdav, price, points, best_points, best_alignment);
+                generate(chosen, i+1, cont1+1, cont0, contpor+1, contdef, contmig, contdav, price_i, points_i, best_points, best_alignment);
             }
-            if(CANDIDATES[i].pos == "def" and contdef < INPUT.N1 and price_bound <= INPUT.T and points_bound > best_points){
+            if(CANDIDATES[i].pos == "def" and contdef < INPUT.N1) {
                 chosen[i] = 1;
-                generate (chosen, i+1, cont1+1, cont0, contpor, contdef+1, contmig, contdav, price, points, best_points, best_alignment);
+                generate(chosen, i+1, cont1+1, cont0, contpor, contdef+1, contmig, contdav, price_i, points_i, best_points, best_alignment);
             }
-            if(CANDIDATES[i].pos == "mig" and contmig < INPUT.N2 and price_bound <= INPUT.T and points_bound > best_points){
+            if(CANDIDATES[i].pos == "mig" and contmig < INPUT.N2) {
                 chosen[i] = 1;
-                generate (chosen, i+1, cont1+1, cont0, contpor, contdef, contmig+1, contdav, price, points, best_points, best_alignment);
+                generate(chosen, i+1, cont1+1, cont0, contpor, contdef, contmig+1, contdav, price_i, points_i, best_points, best_alignment);
             }
-            if(CANDIDATES[i].pos == "dav" and contdav < INPUT.N3 and price_bound <= INPUT.T and points_bound > best_points){
+            if(CANDIDATES[i].pos == "dav" and contdav < INPUT.N3) {
                 chosen[i] = 1;
-                generate (chosen, i+1, cont1+1, cont0, contpor, contdef, contmig, contdav+1, price, points, best_points, best_alignment);
+                generate(chosen, i+1, cont1+1, cont0, contpor, contdef, contmig, contdav+1, price_i, points_i, best_points, best_alignment);
             }
         }
     }
@@ -163,7 +160,7 @@ void get_alignment(const vector<Player>& players) {
     generate_alignment();
 }
 
-//******************************************************************************
+// *******************************************************************************
 
 // Returns the data base of the players
 vector<Player> read_data(char* argv) {
@@ -186,20 +183,20 @@ vector<Player> read_data(char* argv) {
 }
 
 // Reads the input restrictions
-void read_input(char* argv){
+void read_input(char* argv) {
     ifstream in(argv);
     int N1, N2, N3, T, J;
-    while(not in.eof()){
+    while(not in.eof()) {
         in >> N1 >> N2 >> N3 >> T >> J;
         INPUT = {N1, N2, N3, T ,J};
     } in.close();
 }
 
-//******************************************************************************
+// *******************************************************************************
 
 /** Input: ./a.out data_base.txt Projecte/public_benchs/easy-1.txt
     Input (pequeña): ./a.out data.txt easy-0.txt */
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     START = clock();
     vector<Player> players = read_data(argv[1]);
     read_input(argv[2]);
