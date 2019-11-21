@@ -1,3 +1,5 @@
+// AUTORS: Patricia Cabot, Yinlena Xu
+
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -29,30 +31,9 @@ vector<Player> CANDIDATES;
 
 // *******************************************************************************
 
-void print_alignment(const vector<Player>& alignment) {
-    cout << float(clock() - START)/CLOCKS_PER_SEC << endl;
-    int points = 0, price = 0;
-    int n2 =  1+INPUT.N1;
-    int n3 = n2+INPUT.N2;
-    bool first = true;
-    for(int i = 0; i < 11; ++i) {
-        if(i ==  0)  cout << "POR: ";
-        if(i ==  1) {cout << endl << "DEF: "; first = true;}
-        if(i == n2) {cout << endl << "MIG: "; first = true;}
-        if(i == n3) {cout << endl << "DAV: "; first = true;}
-        if(not first) cout << ";";
-        first = false;
-        cout << alignment[i].name;
-        points += alignment[i].points;
-        price  += alignment[i].price;
-    } cout << endl;
-    cout << "Punts: " << points << endl;
-    cout << "Preu: "  << price  << endl;
-}
-
 // Creates a file with the output
-void write_alignment(const vector<Player>& alignment) {
-    ofstream f("output.txt");
+void write_alignment(const vector<Player>& alignment, char* argv) {
+    ofstream f(argv);
     f << float(clock() - START)/CLOCKS_PER_SEC << endl;
     int points = 0, price = 0;
     int n2 = INPUT.N1+1;
@@ -88,7 +69,7 @@ vector<Player> chosen_to_alignment(const vector<int>& chosen) {
     i: position in the vector
     cont_: keeps track of how many players of each kind */
 void generate_alignment(vector<int>& chosen, int i, int cont0, int contpor, int contdef, int contmig, int contdav,
-                        int price, int points, int& best_points, vector<Player>& best_alignment) {
+                        int price, int points, int& best_points, vector<Player>& best_alignment, char* argv) {
 
     int n = chosen.size();
     int cont1 = contpor+contdef+contmig+contdav;
@@ -96,7 +77,7 @@ void generate_alignment(vector<int>& chosen, int i, int cont0, int contpor, int 
     if(cont1 == 11 and points > best_points) {
             best_points = points;
             best_alignment = chosen_to_alignment(chosen);
-            write_alignment(best_alignment);
+            write_alignment(best_alignment, argv);
     }
     else if(i < n) {
         int price_i  = price+CANDIDATES[i].price;
@@ -106,30 +87,27 @@ void generate_alignment(vector<int>& chosen, int i, int cont0, int contpor, int 
         if(price_bound <= INPUT.T and points_bound > best_points) {
             chosen[i] = 1;
             if(CANDIDATES[i].pos == "por" and contpor < 1)
-                generate_alignment(chosen, i+1, cont0, contpor+1, contdef, contmig, contdav, price_i, points_i, best_points, best_alignment);
+                generate_alignment(chosen, i+1, cont0, contpor+1, contdef, contmig, contdav, price_i, points_i, best_points, best_alignment, argv);
             if(CANDIDATES[i].pos == "def" and contdef < INPUT.N1)
-                generate_alignment(chosen, i+1, cont0, contpor, contdef+1, contmig, contdav, price_i, points_i, best_points, best_alignment);
+                generate_alignment(chosen, i+1, cont0, contpor, contdef+1, contmig, contdav, price_i, points_i, best_points, best_alignment, argv);
             if(CANDIDATES[i].pos == "mig" and contmig < INPUT.N2)
-                generate_alignment(chosen, i+1, cont0, contpor, contdef, contmig+1, contdav, price_i, points_i, best_points, best_alignment);
+                generate_alignment(chosen, i+1, cont0, contpor, contdef, contmig+1, contdav, price_i, points_i, best_points, best_alignment, argv);
             if(CANDIDATES[i].pos == "dav" and contdav < INPUT.N3)
-                generate_alignment(chosen, i+1, cont0, contpor, contdef, contmig, contdav+1, price_i, points_i, best_points, best_alignment);
+                generate_alignment(chosen, i+1, cont0, contpor, contdef, contmig, contdav+1, price_i, points_i, best_points, best_alignment, argv);
         }
         if(cont0 < n-11) {
             chosen[i] = 0;
-            generate_alignment(chosen, i+1, cont0+1, contpor, contdef, contmig, contdav, price, points, best_points, best_alignment);
+            generate_alignment(chosen, i+1, cont0+1, contpor, contdef, contmig, contdav, price, points, best_points, best_alignment, argv);
         }
     }
 }
 
-void get_alignment() {
+void get_alignment(char* argv) {
     int n = CANDIDATES.size();
     vector<int> chosen(n); // From all players, the ones chosen for the alignment
     int best_points = 0;
     vector<Player> best_alignment; // the best alignment found at the moment
-    generate_alignment(chosen, 0, 0, 0, 0, 0, 0, 0, 0, best_points, best_alignment);
-
-    //----------------------------------------------------------------------------BORRAR ESTO LUEGO
-    print_alignment(best_alignment);
+    generate_alignment(chosen, 0, 0, 0, 0, 0, 0, 0, 0, best_points, best_alignment, argv);
 }
 
 // *******************************************************************************
@@ -167,7 +145,6 @@ void read_data(char* argv) {
             if(points > MAX_POINTS) MAX_POINTS = points;
         }
     } in.close();
-    //sort(CANDIDATES.begin(), CANDIDATES.end(), comparator);
 }
 
 // *******************************************************************************
@@ -176,5 +153,5 @@ int main(int argc, char** argv) {
     START = clock();
     read_input(argv[2]);
     read_data(argv[1]);
-    get_alignment();
+    get_alignment(argv[3]);
 }
