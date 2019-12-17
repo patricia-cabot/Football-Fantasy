@@ -4,7 +4,6 @@
 #include <vector>       /* find() */
 #include <ctime>        /* clock() */
 #include <fstream>      /* ifstream(), getline() */
-#include <algorithm>    /* sort() */
 #include <cstdlib>      /* rand() */
 
 using namespace std;
