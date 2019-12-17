@@ -23,25 +23,25 @@ struct Player {
     int points;
 };
 
-/* Defining operator== to use function find() */
+/** Defining operator== to use function find() */
 bool operator==(const Player& p1, const Player& p2) {
     return p1.name == p2.name;
 }
 
-/* SIMULATED ANNEALING PARAMETERS */
+/** SIMULATED ANNEALING PARAMETERS */
 double T = 1;                       // Temperature
 const double Tmin = 0.00001;        // Temperature at which iteration terminates
 const double alpha = 0.95;          // Decrease in temperature
 const int numIterations = 10000;    // Number of iterations of annealing before decreasing temperature
 
-/* GLOBAL VARIABLES */
+/** GLOBAL VARIABLES */
 time_t START;
 Input INPUT;
 vector<Player> POR, DEF, MIG, DAV;
 
 // *******************************************************************************
 
-/* Creates a file with the output. */
+/** Creates a file with the output */
 void write_alignment(const vector<Player>& alignment, char* argv) {
     ofstream f(argv);
     f << float(clock() - START)/CLOCKS_PER_SEC << endl;
@@ -67,7 +67,7 @@ void write_alignment(const vector<Player>& alignment, char* argv) {
 
 // *******************************************************************************
 
-/* Generates the inicial alignment. */
+/** Generates the inicial alignment */
 vector<Player> generate_alignment(int& alignment_points) {
     vector<Player> alignment(11);
     alignment[0] = POR[rand()%(POR.size()+1)];
@@ -81,9 +81,9 @@ vector<Player> generate_alignment(int& alignment_points) {
     return alignment;
 }
 
-/* Generates a neighbour alignment.
-   A neighbourhood is made of all alignments that differ in only one player
-   from the initial alignment. */
+/** Generates a neighbour alignment
+    A neighbourhood is made of all alignments that differ in only one player
+    from the initial alignment */
 void random_update(vector<Player>& neighbour_alignment, int& neighbour_points, int p) {
     bool updated = false;
     int i;
@@ -118,7 +118,7 @@ void random_update(vector<Player>& neighbour_alignment, int& neighbour_points, i
     neighbour_points += neighbour_alignment[p].points;
 }
 
-/* Picks a random neighbour. */
+/** Picks a random neighbour */
 vector<Player> pick_at_random(const vector<Player>& alignment, int& neighbour_points) {
     int p = rand()%(11);
     neighbour_points -= alignment[p].points;
@@ -127,8 +127,8 @@ vector<Player> pick_at_random(const vector<Player>& alignment, int& neighbour_po
     return neighbour_alignment;
 }
 
-/* Updates the temperature following a geometric law such that
-   T_(k+1) = α*T_k , with α ∈ [0, 1] */
+/** Updates the temperature following a geometric law such that
+    T_(k+1) = α*T_k , with α ∈ [0, 1] */
 void update(double& T) {
     T *= alpha;
 }
@@ -152,7 +152,7 @@ void get_alignment(char* argv) {
 
 // *******************************************************************************
 
-/* Reads the input restrictions. */
+/** Reads the input restrictions */
 void read_input(char* argv) {
     ifstream in(argv);
     int N1, N2, N3, T, J;
@@ -162,7 +162,7 @@ void read_input(char* argv) {
     } in.close();
 }
 
-/* Returns the data base of the players. */
+/** Returns the data base of the players */
 void read_data(char* argv) {
     ifstream in(argv);
     while(not in.eof()) {
