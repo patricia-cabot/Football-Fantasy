@@ -1,7 +1,7 @@
 // AUTORS: Patricia Cabot, Yinlena Xu
 
-#include <iostream>     /* cin, cout */
-#include <vector>       /* find() */
+#include <iostream>
+#include <vector>
 #include <ctime>        /* clock() */
 #include <fstream>      /* ifstream(), getline() */
 #include <cstdlib>      /* rand() */
@@ -22,7 +22,7 @@ struct Player {
     int points;
 };
 
-/** Defining operator== to use function find() */
+/** Defining operator== for function find() */
 bool operator==(const Player& p1, const Player& p2) {
     return p1.name == p2.name;
 }

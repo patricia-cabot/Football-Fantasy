@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <vector>
-#include <ctime>
-#include <fstream>
-#include <limits>
+#include <ctime>        /* clock() */
+#include <fstream>      /* ifstream(), getline() */
+#include <limits>       /* numeric_limits<int>::max() */
 
 using namespace std;
 
@@ -31,7 +31,7 @@ vector<Player> CANDIDATES;
 
 // *******************************************************************************
 
-// Creates a file with the output
+/** Creates a file with the output */
 void write_alignment(const vector<Player>& alignment, char* argv) {
     ofstream f(argv);
     f << float(clock() - START)/CLOCKS_PER_SEC << endl;
@@ -57,7 +57,7 @@ void write_alignment(const vector<Player>& alignment, char* argv) {
 
 // *******************************************************************************
 
-// Converts the chosen vector into an alignment
+/** Converts the chosen vector into an alignment */
 vector<Player> chosen_to_alignment(const vector<int>& chosen) {
     int n = chosen.size();
     vector<Player> alignment;
@@ -104,15 +104,15 @@ void generate_alignment(vector<int>& chosen, int i, int cont0, int contpor, int 
 
 void get_alignment(char* argv) {
     int n = CANDIDATES.size();
-    vector<int> chosen(n); // From all players, the ones chosen for the alignment
+    vector<int> chosen(n);          // From all players, the ones chosen for the alignment
     int best_points = 0;
-    vector<Player> best_alignment; // the best alignment found at the moment
+    vector<Player> best_alignment;  // the best alignment found at the moment
     generate_alignment(chosen, 0, 0, 0, 0, 0, 0, 0, 0, best_points, best_alignment, argv);
 }
 
 // *******************************************************************************
 
-// Reads the input restrictions
+/** Reads the input restrictions */
 void read_input(char* argv) {
     ifstream in(argv);
     int N1, N2, N3, T, J;
@@ -122,7 +122,7 @@ void read_input(char* argv) {
     } in.close();
 }
 
-// Returns the data base of the players
+/** Returns the data base of the players */
 void read_data(char* argv) {
     MIN_PRICE  = numeric_limits<int>::max();
     MAX_POINTS = 0;

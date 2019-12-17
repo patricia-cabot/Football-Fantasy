@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <vector>
-#include <ctime>     /* clock() */
-#include <fstream>   /* ifstream(), getline() */
-#include <algorithm> /* sort() */
+#include <ctime>        /* clock() */
+#include <fstream>      /* ifstream(), getline() */
+#include <algorithm>    /* sort() */
 
 using namespace std;
 
