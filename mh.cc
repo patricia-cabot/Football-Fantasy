@@ -5,6 +5,7 @@
 #include <ctime>        /* clock() */
 #include <fstream>      /* ifstream(), getline() */
 #include <cstdlib>      /* rand() */
+#include <algorithm>    /* find() */
 
 using namespace std;
 
@@ -31,7 +32,7 @@ bool operator==(const Player& p1, const Player& p2) {
 double T = 1;                       // Temperature
 const double Tmin = 0.00001;        // Temperature at which iteration terminates
 const double alpha = 0.95;          // Decrease in temperature
-const int numIterations = 10000;    // Number of iterations of annealing before decreasing temperature
+const int numIterations = 100000;    // Number of iterations of annealing before decreasing temperature
 
 /** GLOBAL VARIABLES */
 time_t START;
@@ -55,7 +56,7 @@ void write_alignment(const vector<Player>& alignment, char* argv) {
         if(i == n3) {f << endl << "DAV: ";  first = true;}
         if(not first) f << ";";
         first = false;
-        f << alignment[i].name << " " << alignment[i].pos;
+        f << alignment[i].name << " " << alignment[i].pos << " " << alignment[i].price;
         points += alignment[i].points;
         price  += alignment[i].price;
     } f << endl;
@@ -66,16 +67,33 @@ void write_alignment(const vector<Player>& alignment, char* argv) {
 
 // *******************************************************************************
 
+/** Given a candidates vector of players, an alignment vector and the position to change,
+    it choses a random player and updates the alignment under the given price condition */
+void update_player(vector<Player>& CAND, vector<Player>& alignment, int p, int price) {
+    int i;
+    bool updated = false;
+    while(not updated) {
+        i = rand()%(CAND.size()+1);
+        if(find(alignment.begin(), alignment.end(), CAND[i]) == alignment.end() and price+CAND[i].price <= INPUT.T) {
+            alignment[p] = CAND[i];
+            updated = true;
+            return;
+        }
+    }
+}
+
 /** Generates the inicial alignment */
-vector<Player> generate_alignment(int& alignment_points) {
+vector<Player> generate_alignment(int& alignment_points, int& alignment_price) {
     vector<Player> alignment(11);
     alignment[0] = POR[rand()%(POR.size()+1)];
     alignment_points = alignment[0].points;
+    alignment_price = alignment[0].price;
     for(int i = 1; i < 11; ++i) {
-             if(i <= INPUT.N1) alignment[i] = DEF[rand()%(DEF.size()+1)];
-        else if(i <= INPUT.N1+INPUT.N2) alignment[i] = MIG[rand()%(MIG.size()+1)];
-        else alignment[i] = DAV[rand()%(DAV.size()+1)];
+        if(i <= INPUT.N1) update_player(DEF, alignment, i, alignment_price);
+        else if(i <= INPUT.N1+INPUT.N2) update_player(MIG, alignment, i, alignment_price);
+        else update_player(DAV, alignment, i, alignment_price);
         alignment_points += alignment[i].points;
+        alignment_price += alignment[i].price;
     }
     return alignment;
 }
@@ -83,46 +101,22 @@ vector<Player> generate_alignment(int& alignment_points) {
 /** Generates a neighbour alignment
     A neighbourhood is made of all alignments that differ in only one player
     from the initial alignment */
-void random_update(vector<Player>& neighbour_alignment, int& neighbour_points, int p) {
-    bool updated = false;
-    int i;
-    if(neighbour_alignment[p].pos == "por") {
-        while(not updated) {
-            i = rand()%(POR.size()+1);
-            if(find(neighbour_alignment.begin(), neighbour_alignment.end(), POR[i]) == neighbour_alignment.end()) {
-                neighbour_alignment[p] = POR[i];
-                updated = true;
-    }   }   }
-    else if(neighbour_alignment[p].pos == "def") {
-        while(not updated) {
-            i = rand()%(DEF.size()+1);
-            if(find(neighbour_alignment.begin(), neighbour_alignment.end(), DEF[i]) == neighbour_alignment.end()) {
-                neighbour_alignment[p] = DEF[i];
-                updated = true;
-    }   }   }
-    else if(neighbour_alignment[p].pos == "mig") {
-        while(not updated) {
-            i = rand()%(MIG.size()+1);
-            if(find(neighbour_alignment.begin(), neighbour_alignment.end(), MIG[i]) == neighbour_alignment.end()) {
-                neighbour_alignment[p] = MIG[i];
-                updated = true;
-    }   }   }
-    else {
-        while(not updated) {
-            i = rand()%(DAV.size()+1);
-            if(find(neighbour_alignment.begin(), neighbour_alignment.end(), DAV[i]) == neighbour_alignment.end()) {
-                neighbour_alignment[p] = DAV[i];
-                updated = true;
-    }   }   }
+void random_update(vector<Player>& neighbour_alignment, int& neighbour_points, int& neighbour_price, int p) {
+    if(neighbour_alignment[p].pos == "por") update_player(POR, neighbour_alignment, p, neighbour_price);
+    else if(neighbour_alignment[p].pos == "def") update_player(DEF, neighbour_alignment, p, neighbour_price);
+    else if(neighbour_alignment[p].pos == "mig") update_player(MIG, neighbour_alignment, p, neighbour_price);
+    else update_player(DAV, neighbour_alignment, p, neighbour_price);
     neighbour_points += neighbour_alignment[p].points;
+    neighbour_price += neighbour_alignment[p].price;
 }
 
 /** Picks a random neighbour */
-vector<Player> pick_at_random(const vector<Player>& alignment, int& neighbour_points) {
+vector<Player> pick_at_random(const vector<Player>& alignment, int& neighbour_points, int& neighbour_price) {
     int p = rand()%(11);
     neighbour_points -= alignment[p].points;
+    neighbour_price -= alignment[p].price;
     vector<Player> neighbour_alignment = alignment;
-    random_update(neighbour_alignment, neighbour_points, p);
+    random_update(neighbour_alignment, neighbour_points, neighbour_price, p);
     return neighbour_alignment;
 }
 
@@ -132,16 +126,20 @@ void update(double& T) {
     T *= alpha;
 }
 
+/** Uses Simulated annealing metaheuristic algorithm to get the optim alignment */
 void get_alignment(char* argv) {
     int alignment_points;
-    vector<Player> alignment = generate_alignment(alignment_points);
+    int alignment_price;
+    vector<Player> alignment = generate_alignment(alignment_points, alignment_price);
     while(T > Tmin) {
         for(int i = 0; i < numIterations; ++i) {
             int neighbour_points = alignment_points;
-            vector<Player> neighbour_alignment = pick_at_random(alignment, neighbour_points);
+            int neighbour_price = alignment_price;
+            vector<Player> neighbour_alignment = pick_at_random(alignment, neighbour_points, neighbour_price);
             if(neighbour_points > alignment_points or rand() < T) {
                 alignment = neighbour_alignment;
                 alignment_points = neighbour_points;
+                alignment_price = neighbour_price;
                 write_alignment(alignment, argv);
             }
         }
