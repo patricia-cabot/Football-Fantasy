@@ -29,10 +29,10 @@ bool operator==(const Player& p1, const Player& p2) {
 }
 
 /** SIMULATED ANNEALING PARAMETERS */
-double T = 1;                       // Temperature
+double T = 0.99;                    // Temperature
 const double Tmin = 0.00001;        // Temperature at which iteration terminates
 const double alpha = 0.95;          // Decrease in temperature
-const int numIterations = 100000;    // Number of iterations of annealing before decreasing temperature
+const int numIterations = 100000;   // Number of iterations of annealing before decreasing temperature
 
 /** GLOBAL VARIABLES */
 time_t START;
@@ -56,7 +56,7 @@ void write_alignment(const vector<Player>& alignment, char* argv) {
         if(i == n3) {f << endl << "DAV: ";  first = true;}
         if(not first) f << ";";
         first = false;
-        f << alignment[i].name << " " << alignment[i].pos << " " << alignment[i].price;
+        f << alignment[i].name;
         points += alignment[i].points;
         price  += alignment[i].price;
     } f << endl;
@@ -186,6 +186,7 @@ void read_data(char* argv) {
 
 int main(int argc, char** argv) {
     START = clock();
+    srand(time(NULL));
     read_input(argv[2]);
     read_data(argv[1]);
     get_alignment(argv[3]);
